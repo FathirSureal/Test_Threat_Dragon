@@ -1,124 +1,128 @@
-            "vertices": [
-              {
-                "x": 1172,
-                "y": 234
-              }
-            ]
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "red",
-                "strokeWidth": 1.5,
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": "",
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 19,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "F11 Tulis dan query data",
-              "description": "Data yang dikirim: Perintah untuk menulis atau mengubah sesi, menyimpan catatan kehadiran, serta mengambil data keanggotaan kelas, jadwal, dan rekap.\nKanal: Koneksi ke basis data.\nBatas kepercayaan: Dari lingkungan kampus menuju TB3.",
-              "outOfScope": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": true,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [
-                {
-                  "id": "fee52510-7d9c-5f02-af81-375eb390017e",
-                  "title": "T10 - Injeksi SQL pada operasi tulis/baca data presensi",
-                  "status": "Open",
-                  "severity": "Medium",
-                  "type": "Tampering",
-                  "description": "Skenario: Penyerang memasukkan input berbahaya ke dalam parameter seperti session_id, class_id, atau filter rekap. Jika Backend menyusun query tanpa parameterisasi, input tersebut dapat dimanfaatkan untuk mengubah atau menambahkan catatan kehadiran serta membaca data lain di Database Akademik.\nAsumsi: A4 menyebutkan bahwa praktik akses Database yang dilakukan Backend belum dijelaskan secara rinci.\nDampak: Keutuhan data dan kerahasiaan informasi akademik dapat terancam.\nRisiko: Kemungkinan 1 x dampak 3, dengan skor 3 (Sedang).",
-                  "mitigation": "1. Gunakan prepared statement atau ORM dengan query terparameter. Validasi tipe dan panjang setiap input yang diterima.\n2. Berikan hak akses minimum pada akun Database. Hindari pemberian hak DDL atau DROP jika tidak diperlukan dan tampilkan pesan error umum kepada klien.\n3. Lakukan peninjauan kode serta pengujian SAST dan DAST dalam pipeline pengembangan.",
-                  "modelType": "STRIDE",
-                  "new": false,
-                  "number": 10,
-                  "score": "3"
-                }
-              ]
-            },
-            "id": "923baf05-de17-5216-bd86-a61c963b4c2e",
-            "labels": [
-              "F11 Tulis dan query data"
-            ],
-            "source": {
-              "cell": "b3b18195-f5b4-5ae6-8367-80b7e97a7674"
-            },
-            "target": {
-              "cell": "6ee0e43e-d2ba-5a85-bd24-703881cce7f7"
-            },
-            "vertices": [
-              {
-                "x": 1172,
-                "y": 551
-              }
-            ]
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": "",
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 20,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "F12 Hasil query",
-              "description": "Data yang dikirim: Informasi keanggotaan kelas, status sesi, catatan kehadiran, dan data rekap.\nKanal: Koneksi ke basis data.\nBatas kepercayaan: Dari TB3 menuju lingkungan kampus.",
-              "outOfScope": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": false,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": []
-            },
-            "id": "6563f0d4-2e41-5c92-8c82-b1227991e2e4",
-            "labels": [
-              "F12 Hasil query"
-            ],
-            "source": {
-              "cell": "6ee0e43e-d2ba-5a85-bd24-703881cce7f7"
-            },
-            "target": {
-              "cell": "b3b18195-f5b4-5ae6-8367-80b7e97a7674"
-            },
-            "vertices": [
-              {
-                "x": 1208,
-                "y": 484
-              }
-            ]
-          }
-        ],
-        "description": "DFD ini menampilkan komponen utama sistem presensi QR, yaitu 3 aktor, 2 proses, 1 penyimpanan data, 1 layanan autentikasi eksternal, 12 alur data, dan 3 batas kepercayaan. Diagram menampilkan paling banyak 3 ancaman pada setiap elemen. Daftar lengkap ancaman T01 sampai T21 tersedia pada laporan PDF."
+{
+  "version": "2.4.0",
+  "summary": {
+    "title": "STRIDE - Kasus A - Presensi Perkuliahan Berbasis QR Code",
+    "owner": "Fathir Al Farih",
+    "description": "Model ancaman STRIDE ini membahas Sistem Presensi Perkuliahan Berbasis QR Code pada Kasus A.\n\nRuang lingkup: Sistem yang dianalisis mencakup proses membuka dan menutup sesi presensi, memindai QR, memvalidasi kehadiran, serta melihat rekap kehadiran. Pendaftaran mata kuliah dan perubahan nilai tidak termasuk dalam analisis ini.\n\nAsumsi:\nA1. QR berisi satu token sesi acak yang digunakan oleh semua pemindai. Token berlaku selama lima menit dan ditampilkan secara statis pada layar kelas. Token belum terikat dengan perangkat atau lokasi pengguna.\nA2. Proses autentikasi pengguna ditangani oleh Backend melalui Layanan Autentikasi Kampus, misalnya SSO. Token atau cookie sesi disimpan di browser dan dikirim bersama setiap request. Informasi mengenai masa berlaku token dan penerapan MFA tidak tersedia dalam kasus.\nA3. Komunikasi antarkomponen menggunakan HTTPS/TLS standar. Informasi mengenai kontrol tambahan seperti rate limiting, WAF, device binding, dan geofencing tidak tersedia. Karena itu, analisis ancaman dilakukan dengan menganggap penerapan kontrol tersebut belum dapat dipastikan.\nA4. Hanya Backend yang terhubung ke Database Akademik. Pemeriksaan peran pengguna, kepemilikan kelas, dan keanggotaan kelas seharusnya dilakukan oleh Backend, bukan oleh aplikasi di sisi pengguna. Namun, penerapan aturan tersebut belum dapat dipastikan.\nA5. Kasus tidak menjelaskan adanya audit log khusus untuk aktivitas membuka dan menutup sesi, presensi, maupun akses rekap. Untuk analisis ini, diasumsikan sistem hanya menyimpan waktu pada catatan kehadiran dan belum memiliki log terpusat yang terlindungi dari perubahan.",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [
+      {
+        "name": "Fathir Al Farih"
       }
     ],
-    "diagramTop": 1,
-    "reviewer": "",
-    "threatTop": 21
-  }
-}
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "DFD Presensi QR - Komponen Utama",
+        "diagramType": "STRIDE",
+        "placeholder": "Diagram STRIDE Kasus A",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.4.0",
+        "cells": [
+          {
+            "position": {
+              "x": 20,
+              "y": 40
+            },
+            "size": {
+              "width": 600,
+              "height": 760
+            },
+            "attrs": {
+              "text": {
+                "text": "TB1 - Perangkat pengguna & ruang kelas (tidak tepercaya)"
+              },
+              "label": {
+                "text": "TB1 - Perangkat pengguna & ruang kelas (tidak tepercaya)"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 2.0,
+                "strokeDasharray": "5 5"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "id": "67de3a68-b979-582e-8ef9-b76fa766de8d",
+            "zIndex": 0,
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "TB1 - Perangkat pengguna & ruang kelas (tidak tepercaya)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 1290,
+              "y": 40
+            },
+            "size": {
+              "width": 270,
+              "height": 200
+            },
+            "attrs": {
+              "text": {
+                "text": "TB2 - Zona layanan identitas"
+              },
+              "label": {
+                "text": "TB2 - Zona layanan identitas"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 2.0,
+                "strokeDasharray": "5 5"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "id": "b21e7107-4bcc-5f22-b591-596d3601f78c",
+            "zIndex": 0,
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "TB2 - Zona layanan identitas",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 1290,
+              "y": 540
+            },
+            "size": {
+              "width": 270,
+              "height": 200
+            },
+            "attrs": {
+              "text": {
+                "text": "TB3 - Zona data akademik"
+              },
+              "label": {
+                "text": "TB3 - Zona data akademik"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 2.0,
+                "strokeDasharray": "5 5"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "id": "f9d5291a-a7cd-59d3-8568-6f6a6df03a6a",
+            "zIndex": 0,
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "TB3 - Zona data akademik",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 60,
