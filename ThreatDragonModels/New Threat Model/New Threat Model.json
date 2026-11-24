@@ -2,20 +2,20 @@
   "version": "2.4.0",
   "summary": {
     "title": "STRIDE Kasus (A) Presensi Perkuliahan Berbasis QR Code",
-    "owner": "Fathir - Julio - Fahmi",
+    "owner": "Fathir - Fahmi - Julio",
     "description": "Model Ancaman STRIDE untuk Sistem Presensi Perkuliahan Berbasis Kode QR (Kasus A). Ruang lingkup mencakup pembukaan dan penutupan sesi, pemindaian kode QR, validasi kehadiran, serta pembacaan rekap. Di luar ruang lingkup adalah pendaftaran mata kuliah dan perubahan nilai. Asumsi yang digunakan adalah sebagai berikut.\nA1. Kode QR memuat token sesi acak yang identik bagi seluruh pemindai selama masa berlaku lima menit dan ditampilkan secara statis pada layar kelas. Token tersebut tidak terikat pada perangkat maupun lokasi.\nA2. Autentikasi pengguna didelegasikan oleh Backend kepada Layanan Autentikasi Kampus, misalnya SSO. Token atau cookie sesi disimpan di peramban dan dikirimkan pada setiap permintaan. Masa berlaku token dan penggunaan MFA tidak dijelaskan dalam kasus.\nA3. Komunikasi antarkomponen menggunakan HTTPS/TLS standar. Kontrol tambahan seperti rate limiting, WAF, device binding, dan geofencing tidak dijelaskan sehingga tidak diasumsikan pasti ada maupun pasti tidak ada. Ancaman dinilai pada kondisi kontrol tersebut belum terbukti diterapkan.\nA4. Hanya Backend yang mengakses Database Akademik. Keputusan otorisasi berupa peran, kepemilikan kelas, dan keanggotaan kelas diambil di Backend, bukan di klien. Kebenaran implementasinya belum diketahui.\nA5. Audit log khusus untuk pembukaan/penutupan sesi, presensi, dan akses rekap tidak dijelaskan. Diasumsikan hanya terdapat stempel waktu pada catatan kehadiran dan belum tersedia log terpusat yang tidak dapat diubah.",
     "id": 0
   },
   "detail": {
     "contributors": [
       {
-        "name": "Fathir Al Farih"
+        "name": "Fathir Al Farih - 103072400002"
       },
       {
-        "name": "Fahmi Fajar Maulana"
+        "name": "Fahmi Fajar Maulana - 103072400069"
       },
       {
-        "name": "Julio Chrysanto Tanlain"
+        "name": "Julio Chrysanto Tanlain - 103072400096"
       }
     ],
     "diagrams": [
