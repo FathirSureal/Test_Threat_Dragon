@@ -1208,7 +1208,7 @@
             ]
           }
         ],
-        "description": "DFD level komponen utama: 3 actor, 2 process, 1 data store, 1 layanan autentikasi eksternal, 12 data flow, 3 trust boundary. Maks 3 ancaman per elemen; ancaman lengkap ada pada laporan PDF."
+        "description": "DFD level komponen utama: 3 actor, 2 process, 1 data store, 1 layanan autentikasi eksternal, 12 data flow, 3 trust boundary."
       }
     ],
     "diagramTop": 1,
