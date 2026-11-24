@@ -1,21 +1,27 @@
 {
   "version": "2.4.0",
   "summary": {
-    "title": "STRIDE - Kasus A - Presensi Perkuliahan Berbasis QR Code",
-    "owner": "Fathir Al Farih",
-    "description": "Threat model STRIDE untuk Sistem Presensi Perkuliahan Berbasis QR Code (Kasus A). Ruang lingkup: buka/tutup sesi, pemindaian QR, validasi kehadiran, dan pembacaan rekap. Di luar lingkup: pendaftaran mata kuliah dan perubahan nilai. Asumsi: A1: QR memuat token sesi acak yang sama untuk semua pemindai selama masa berlaku lima menit dan ditampilkan statis di layar kelas; token tidak terikat pada perangkat maupun lokasi. A2: Autentikasi pengguna didelegasikan Backend ke Layanan Autentikasi Kampus (mis. SSO); token/cookie sesi disimpan di browser dan dikirim pada setiap request. Masa berlaku token dan penggunaan MFA tidak dijelaskan dalam kasus. A3: Komunikasi antarkomponen memakai HTTPS/TLS standar. Kontrol tambahan seperti rate limiting, WAF, device binding, dan geofencing tidak dijelaskan sehingga tidak dianggap pasti ada maupun pasti tidak ada; ancaman dinilai pada kondisi kontrol tersebut belum terbukti diterapkan. A4: Hanya Backend yang mengakses Database Akademik, dan keputusan otorisasi (peran, kepemilikan kelas, keanggotaan kelas) diambil di Backend, bukan di klien. Kebenaran implementasinya belum diketahui. A5: Audit log khusus untuk pembukaan/penutupan sesi, presensi, dan akses rekap tidak dijelaskan; diasumsikan hanya ada stempel waktu pada catatan kehadiran dan belum ada log terpusat yang tidak dapat diubah.",
+    "title": "STRIDE Kasus (A) Presensi Perkuliahan Berbasis QR Code",
+    "owner": "Fathir - Julio - Fahmi",
+    "description": "Model Ancaman STRIDE untuk Sistem Presensi Perkuliahan Berbasis Kode QR (Kasus A). Ruang lingkup mencakup pembukaan dan penutupan sesi, pemindaian kode QR, validasi kehadiran, serta pembacaan rekap. Di luar ruang lingkup adalah pendaftaran mata kuliah dan perubahan nilai. Asumsi yang digunakan adalah sebagai berikut.\nA1. Kode QR memuat token sesi acak yang identik bagi seluruh pemindai selama masa berlaku lima menit dan ditampilkan secara statis pada layar kelas. Token tersebut tidak terikat pada perangkat maupun lokasi.\nA2. Autentikasi pengguna didelegasikan oleh Backend kepada Layanan Autentikasi Kampus, misalnya SSO. Token atau cookie sesi disimpan di peramban dan dikirimkan pada setiap permintaan. Masa berlaku token dan penggunaan MFA tidak dijelaskan dalam kasus.\nA3. Komunikasi antarkomponen menggunakan HTTPS/TLS standar. Kontrol tambahan seperti rate limiting, WAF, device binding, dan geofencing tidak dijelaskan sehingga tidak diasumsikan pasti ada maupun pasti tidak ada. Ancaman dinilai pada kondisi kontrol tersebut belum terbukti diterapkan.\nA4. Hanya Backend yang mengakses Database Akademik. Keputusan otorisasi berupa peran, kepemilikan kelas, dan keanggotaan kelas diambil di Backend, bukan di klien. Kebenaran implementasinya belum diketahui.\nA5. Audit log khusus untuk pembukaan/penutupan sesi, presensi, dan akses rekap tidak dijelaskan. Diasumsikan hanya terdapat stempel waktu pada catatan kehadiran dan belum tersedia log terpusat yang tidak dapat diubah.",
     "id": 0
   },
   "detail": {
     "contributors": [
       {
         "name": "Fathir Al Farih"
+      },
+      {
+        "name": "Fahmi Fajar Maulana"
+      },
+      {
+        "name": "Julio Chrysanto Tanlain"
       }
     ],
     "diagrams": [
       {
         "id": 0,
-        "title": "DFD Presensi QR - Komponen Utama",
+        "title": "DFD Presensi QR Mahasiswa",
         "diagramType": "STRIDE",
         "placeholder": "Diagram STRIDE Kasus A",
         "thumbnail": "./public/content/images/thumbnail.stride.jpg",
@@ -218,7 +224,7 @@
                   "mitigation": "Buat audit log yang hanya bisa ditambah (append only) untuk buka tutup sesi, presensi sukses dan gagal, serta akses rekap, lengkap dengan user_id, peran, session_id, IP, user agent, waktu server, dan hasilnya. Kirim log ke penyimpanan terpusat yang terpisah dengan kontrol integritas seperti hash chain atau WORM, dan jaga sinkronisasi waktu. Tetapkan retensi log sesuai kebijakan kampus.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 11,
+                  "number": 8,
                   "score": "4"
                 }
               ],
@@ -269,7 +275,7 @@
                   "mitigation": "Catat setiap akses rekap, mulai dari siapa yang membuka, kelas mana, rentang waktunya, sampai apakah ada ekspor. Pasang alert untuk akses atau ekspor massal dan lakukan tinjauan log berkala oleh pihak independen. Wajibkan MFA untuk akun admin dan batasi fitur ekspor.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 12,
+                  "number": 9,
                   "score": "4"
                 }
               ],
@@ -346,7 +352,7 @@
                   "mitigation": "Gunakan cookie SameSite=Lax atau Strict dan token anti-CSRF per sesi. Verifikasi header Origin atau Referer, dan batasi aksi yang mengubah state hanya lewat POST, PUT, atau DELETE. Minta konfirmasi atau autentikasi ulang untuk aksi sensitif seperti menutup sesi.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 7,
+                  "number": 6,
                   "score": "4"
                 }
               ],
@@ -401,7 +407,7 @@
                   "mitigation": "Terapkan otorisasi tingkat objek pada setiap request, yaitu dosen hanya untuk kelas yang diampu, mahasiswa hanya untuk data sendiri, dan admin sesuai perannya. Filter query berdasarkan identitas yang sudah terautentikasi dan gunakan ID acak seperti UUID sebagai pertahanan berlapis. Siapkan pengujian otorisasi otomatis dan catat akses yang ditolak.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 14,
+                  "number": 11,
                   "score": "6"
                 },
                 {
@@ -414,7 +420,7 @@
                   "mitigation": "Terapkan rate limiting per akun, IP, dan token sesi, serta WAF atau CDN dengan proteksi DDoS. Siapkan autoscaling dan antrean, lalu uji beban untuk kapasitas kelas terbesar yang memindai serentak. Cache status sesi untuk menekan beban DB dan izinkan dosen memperpanjang atau membuka ulang sesi saat ada gangguan. Pasang monitoring dan alert untuk lonjakan request.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 17,
+                  "number": 14,
                   "score": "6"
                 },
                 {
@@ -427,7 +433,7 @@
                   "mitigation": "Terapkan RBAC dan pemeriksaan kepemilikan kelas (dosen_pengampu_id) di Backend pada setiap endpoint dengan kebijakan tolak secara default. Pisahkan jalur API per peran dan tambahkan pengujian negatif pada CI, misalnya mahasiswa memanggil endpoint dosen. Catat percobaan akses yang ditolak dan beri alert kalau terjadi berulang.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 20,
+                  "number": 17,
                   "score": "6"
                 }
               ],
@@ -543,7 +549,7 @@
                   "mitigation": "Izinkan koneksi ke DB hanya dari Backend lewat allowlist firewall atau segmentasi jaringan. Berikan akun DB hak minimum per fungsi, simpan rahasia di secret manager, dan rotasi secara berkala. Aktifkan enkripsi at rest, backup terenkripsi, dan pemantauan query yang janggal.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 16,
+                  "number": 13,
                   "score": "3"
                 },
                 {
@@ -556,7 +562,7 @@
                   "mitigation": "Terapkan paginasi dan batas rentang waktu pada permintaan rekap, dan buat indeks sesuai pola query. Gunakan read replica atau cache atau materialized view untuk rekap, serta timeout dan batas query. Jalankan ekspor besar sebagai pekerjaan antrean di luar jam kuliah.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 19,
+                  "number": 16,
                   "score": "4"
                 }
               ],
@@ -653,7 +659,7 @@
                   "mitigation": "Pakai QR dinamis dengan token yang dirotasi setiap 15 sampai 30 detik dan jendela toleransi yang kecil. Tambahkan sinyal lokasi seperti jaringan Wi-Fi atau IP kampus, atau geolokasi, sebagai pelengkap. Gunakan kode pendamping berupa OTP singkat yang diumumkan dosen di kelas. Deteksi anomali seperti banyak scan dari IP atau perangkat yang sama atau dari luar jaringan kampus, dan beri dosen hak untuk membatalkan entri yang mencurigakan.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 13,
+                  "number": 10,
                   "score": "6"
                 }
               ]
@@ -963,7 +969,7 @@
                   "mitigation": "Wajibkan TLS 1.2 atau 1.3 dengan HSTS tanpa fallback ke HTTP. Minimalkan field pada respons dengan mengirim hanya data yang diperlukan dan masking NIM bila memungkinkan. Pasang Cache-Control: no-store pada halaman daftar hadir dan rekap, dan jangan tampilkan identitas di layar kelas.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 15,
+                  "number": 12,
                   "score": "4"
                 }
               ]
@@ -1024,7 +1030,7 @@
                   "mitigation": "Pasang timeout dan circuit breaker pada pemanggilan ke Layanan Autentikasi. Validasi token secara lokal lewat tanda tangan dan cache singkat hasil verifikasi supaya layanan tidak dipanggil di setiap request. Siapkan prosedur cadangan yang terdokumentasi seperti perpanjangan sesi atau presensi manual, serta SLA dan monitoring ketersediaan.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 18,
+                  "number": 15,
                   "score": "4"
                 }
               ]
@@ -1132,7 +1138,7 @@
                   "mitigation": "Gunakan prepared statement atau ORM terparameter dan validasi tipe serta panjang input. Pakai akun DB dengan hak minimum (tanpa DDL atau DROP) dan kembalikan pesan error yang generik ke klien. Lakukan code review serta SAST dan DAST pada pipeline pengembangan.",
                   "modelType": "STRIDE",
                   "new": false,
-                  "number": 10,
+                  "number": 7,
                   "score": "3"
                 }
               ]
@@ -1202,11 +1208,11 @@
             ]
           }
         ],
-        "description": "DFD level komponen utama: 3 actor, 2 process, 1 data store, 1 layanan autentikasi eksternal, 12 data flow, 3 trust boundary. Maks 3 ancaman per elemen; ancaman lengkap T01-T21 ada pada laporan PDF."
+        "description": "DFD level komponen utama: 3 actor, 2 process, 1 data store, 1 layanan autentikasi eksternal, 12 data flow, 3 trust boundary. Maks 3 ancaman per elemen; ancaman lengkap ada pada laporan PDF."
       }
     ],
     "diagramTop": 1,
-    "reviewer": "",
-    "threatTop": 21
+    "reviewer": "Kharisma Monika Dian Pertiwi, S.Kom., M.Kom.",
+    "threatTop": 17
   }
 }
